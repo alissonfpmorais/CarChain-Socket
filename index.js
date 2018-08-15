@@ -27,6 +27,9 @@ app.listen(3000, function() {
 })
 
 function getLocalIpAddress() {
+    Object.keys(ifaces)
+        .forEach(ifname => console.log(ifname))
+
     return Object.keys(ifaces)
         .filter(ifname => ifname === 'Wi-Fi')
         .map(ifname => {
