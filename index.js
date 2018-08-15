@@ -1,5 +1,6 @@
 const os = require('os')
 const express = require('express')
+const http = require('http')
 const server = require('socket.io')
 const client = require('socket.io-client')
 
@@ -9,6 +10,8 @@ const app = express()
 
 const connectionList = []
 const nodeList = []
+const METADATA_NETWORK_INTERFACE_URL = 'http://metadata/computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip';
+
 const ifaces = os.networkInterfaces()
 const localIp = getLocalIpAddress()
 
@@ -19,6 +22,10 @@ app.get('/:ip', function(req, res) {
     const ip = req.params.ip
     const ioc = client('http://' + ip + ':' + port)
 
+    ioc.on('connect', () => {
+        if (nodeList.notHas(ip)) nodeList.push(ip)
+    })
+    
     ioc.on('node-list', populateNetwork(client))
 })
 
@@ -27,16 +34,19 @@ app.listen(3002, function() {
 })
 
 function getLocalIpAddress() {
-    return Object.keys(ifaces)
-        .filter(ifname => ifname === 'ens4')
-        .map(ifname => {
-            const ip = ifaces[ifname]
-                .filter(iface => iface.family === 'IPv4')
-                .map(iface => iface.address)
-                .reduce(address => address)
+    const options = {
+        url: METADATA_NETWORK_INTERFACE_URL,
+        headers: { 'Metadata-Flavor': 'Google' }
+    }
 
-            return ip
-        })[0]
+    http.request(options, (err, resp, body) => {
+        if (err || resp.statusCode !== 200) {
+            console.log('Error while talking to metadata server, assuming localhost');
+            return cb('localhost');
+        }
+
+        return cb(body);
+    })
 }
 
 function getRemoteIpAddress(remoteAddress) {
