@@ -4,16 +4,16 @@ const request = require('request')
 const server = require('socket.io')
 const client = require('socket.io-client')
 
+const METADATA_NETWORK_INTERFACE_URL = 'http://metadata/computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip';
 const port = 3001
 const ios = server(port)
 const app = express()
 
 const connectionList = []
 const nodeList = []
-const METADATA_NETWORK_INTERFACE_URL = 'http://metadata/computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip';
-
-const ifaces = os.networkInterfaces()
 const localIp = getLocalIpAddress()
+
+console.log(localIp)
 
 nodeList.push(localIp)
 ios.on('connection', onConnectionEstablished(client))
