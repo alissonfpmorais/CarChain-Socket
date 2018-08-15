@@ -12,10 +12,7 @@ const app = express()
 const connectionList = []
 const nodeList = []
 
-getLocalIpAddress((res) => {
-    console.log(res)
-    nodeList.push(res)
-})
+getLocalIpAddress((res) => nodeList.push(res))
 ios.on('connection', onConnectionEstablished(client))
 
 app.get('/:ip', function(req, res) {
