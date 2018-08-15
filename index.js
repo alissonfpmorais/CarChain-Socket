@@ -22,8 +22,8 @@ app.get('/:ip', function(req, res) {
     ioc.on('node-list', populateNetwork(client))
 })
 
-app.listen(80, function() {
-    console.log('listening on 80')
+app.listen(3002, function() {
+    console.log('listening on 3002')
 })
 
 function getLocalIpAddress() {
