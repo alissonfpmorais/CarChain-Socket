@@ -1,6 +1,6 @@
 const os = require('os')
 const express = require('express')
-const http = require('http')
+const request = require('request')
 const server = require('socket.io')
 const client = require('socket.io-client')
 
@@ -39,13 +39,13 @@ function getLocalIpAddress() {
         headers: { 'Metadata-Flavor': 'Google' }
     }
 
-    http.request(options, (err, resp, body) => {
+    request(options, (err, resp, body) => {
         if (err || resp.statusCode !== 200) {
             console.log('Error while talking to metadata server, assuming localhost');
-            return cb('localhost');
+            return 'localhost'
         }
 
-        return cb(body);
+        return body
     })
 }
 
