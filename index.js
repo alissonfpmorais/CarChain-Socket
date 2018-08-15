@@ -11,11 +11,11 @@ const app = express()
 
 const connectionList = []
 const nodeList = []
-const localIp = getLocalIpAddress()
 
-console.log(localIp)
-
-nodeList.push(localIp)
+getLocalIpAddress((res) => {
+    console.log(res)
+    nodeList.push(res)
+})
 ios.on('connection', onConnectionEstablished(client))
 
 app.get('/:ip', function(req, res) {
@@ -33,7 +33,7 @@ app.listen(3002, function() {
     console.log('listening on 3002')
 })
 
-function getLocalIpAddress() {
+function getLocalIpAddress(doAfterRequest) {
     const options = {
         url: METADATA_NETWORK_INTERFACE_URL,
         headers: { 'Metadata-Flavor': 'Google' }
@@ -42,10 +42,10 @@ function getLocalIpAddress() {
     request(options, (err, resp, body) => {
         if (err || resp.statusCode !== 200) {
             console.log('Error while talking to metadata server, assuming localhost');
-            return 'localhost'
+            return doAfterRequest('localhost')
         }
 
-        return body
+        return doAfterRequest(body)
     })
 }
 
