@@ -62,12 +62,21 @@ function selfCheck() {
         (this.connectToPool !== undefined)
 }
 
+function showStatus() {
+    console.log('-------------------------------------------------')
+    console.log('Status')
+    console.log('Living nodes: ' + options.nodesAsClient.concat(options.nodesAsServer))
+
+    setTimeout(() => showStatus(), 30000)
+}
+
 function run(externalIp) {
     options.externalIp = externalIp
     options.nodesAsServer.push(externalIp)
 
     http.run(options)
     server.run(options)
+    showStatus()
 }
 
 getExternalIpAddress()
