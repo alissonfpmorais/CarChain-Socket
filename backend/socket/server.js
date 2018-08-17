@@ -69,7 +69,10 @@ function spreadTheWord(options, payload) {
 
 function emitError(child, payload) {
     console.log(payload)
-    child.emit('error', payload)
+    
+    try { child.emit('error', payload) }
+    catch { }
+
     setTimeout(() => child.disconnect(true), 3000)
 }
 
