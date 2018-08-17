@@ -28,6 +28,7 @@
                 $('form').submit(() => {
                     axios.get('/connect/' + $('#ip_input').val())
                         .then(() => updateNodes())
+                        .catch(err => console.log('Connection error: ' + err))
                 })
             })
 
@@ -38,6 +39,7 @@
                             $('#nodes').append($('<li>').text(node))
                         })
                     })
+                    .catch(err => console.log('Updating nodes error: ' + err))
             }
         </script>
     </body>

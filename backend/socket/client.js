@@ -1,56 +1,64 @@
 require('../../utils/array')()
 
-function run(io, getOptions, remoteIp) {
-    const options = getOptions()
-    if(options.selfCheck()) io.on('connect', onConnect(io, getOptions, remoteIp))
-}
+function run(io, options, remoteIp) {
+    io.on('connect', onConnect(io, options, remoteIp))
 
-function onConnect(io, getOptions, remoteIp) {
-    console.log('establishing connection')
-    var options = getOptions()
-    
-    if(options.selfCheck()) {
-        if(options.clients.notHas(io) && options.nodesAsServer.notHas(remoteIp)) {
-            console.log('node connected to: ' + remoteIp)
+    io.on('server-nodelist', payload => {
+        console.log('server nodelist: ' + payload)
+        
+        if(options.selfCheck()) spreadTheWord(options, payload)
+        else emitError(io, 'client internal error, closing connection!')
+    })
 
-            options.clients.push(io)
-            options.nodesAsServer.push(remoteIp)
+    io.on('nodes-to-connect', payload => {
+        console.log('nodes to connect: ' + payload)
 
-            io.on('server-nodelist', payload => {
-                console.log('server nodelist: ' + payload)
-                spreadTheWord(getOptions(), payload)
-            })
-
-            io.on('nodes-to-connect', payload => {
-                console.log('nodes to connect: ' + payload)
-                spreadTheWord(getOptions(), payload)
-            })
-        } 
-        else emitError(io, 'node previously connected, closing connection!')
-    } 
-    else emitError(io, 'client internal error, closing connection!')
+        if(options.selfCheck()) spreadTheWord(options, payload)
+        else emitError(io, 'client internal error, closing connection!')
+    })
 
     io.on('disconnect', () => {
         console.log('disconnecting...')
 
-        options = getOptions()
-        options.nodesAsServer.remove(remoteIp)
-        options.clients.remove(io)
+        if(options.selfCheck()) {
+            options.nodesAsServer.remove(remoteIp)
+            options.clients.remove(io)
+        }
+        else emitError(io, 'client internal error, closing connection!')
     })
 }
 
+function onConnect(io, options, remoteIp) {
+    return function() {
+        console.log('establishing connection')
+    
+        if(options.selfCheck()) {
+            if(options.clients.notHas(io) && options.nodesAsServer.notHas(remoteIp)) {
+                console.log('node connected to: ' + remoteIp)
+
+                options.clients.push(io)
+                options.nodesAsServer.push(remoteIp)
+            } 
+            else emitError(io, 'node previously connected, closing connection!')
+        } 
+        else emitError(io, 'client internal error, closing connection!')
+    }
+}
+
 function getNodesToConnect(nodes, payload) {
-    const nodesToConnect = []
-
-    if(nodes.length >= payload.length) nodesToConnect.concat(nodes.diff(payload))
-    else nodesToConnect.concat(payload.diff(nodes))
-
+    const nodesToConnect = payload.diff(nodes)
     return nodesToConnect
 }
 
 function spreadTheWord(options, payload) {
+    console.log('spread the word')
+
     const nodes = options.nodesAsClient.concat(options.nodesAsServer)
     const nodesToConnect = getNodesToConnect(nodes, payload)
+
+    console.log('payload: ' + payload)
+    console.log('nodes: ' + nodes)
+    console.log('nodesToConnect: ' + nodesToConnect)
 
     if(nodesToConnect.length > 0) {
         options.connectToPool(nodesToConnect)

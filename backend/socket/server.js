@@ -1,13 +1,11 @@
 require('../../utils/array')()
 
-function run(io, getOptions) {
-    const options = getOptions()
-    if (options.selfCheck()) io.on('connection', onConnection(io, getOptions))
+function run(options) {
+    const io = options.server
+    if (options.selfCheck()) io.on('connection', onConnection(io, options))
 }
 
-function onConnection(io, getOptions) {
-    var options = getOptions()
-
+function onConnection(io, options) {
     if(options.selfCheck()) {
         const nodes = options.nodesAsClient.concat(options.nodesAsServer)
 
@@ -24,16 +22,20 @@ function onConnection(io, getOptions) {
 
                 child.on('nodes-to-connect', payload => {
                     console.log('nodes to connect: ' + payload)
-                    spreadTheWord(getOptions(), payload)
+
+                    if(options.selfCheck()) spreadTheWord(options, payload)
+                    else emitError('node previously connected, closing connection!')
                 })
 
                 child.on('disconnect', () => {
                     console.log('node disconnected')
                     console.log('remote ip: ' + remoteIp)
 
-                    options = getOptions()
-                    options.nodesAsClient.remove(remoteIp)
-                    nodes.remove(remoteIp)
+                    if(options.selfCheck()) {
+                        options.nodesAsClient.remove(remoteIp)
+                        nodes.remove(remoteIp)
+                    }
+                    else emitError('node previously connected, closing connection!')
                 })
             }
             else emitError('node previously connected, closing connection!')
@@ -55,7 +57,7 @@ function getRemoteIpAddress(remoteAddress) {
 }
 
 function spreadTheWord(options, payload) {
-    const nodes = options.nodesAsClients.concat(options.nodesAsServer)
+    const nodes = options.nodesAsClient.concat(options.nodesAsServer)
     const nodesToConnect = getNodesToConnect(nodes, payload)
 
     if(nodesToConnect.length > 0) {

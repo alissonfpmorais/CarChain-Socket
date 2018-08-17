@@ -3,23 +3,19 @@ const path = require('path')
 const app = express()
 const port = 3002
 
-function run(getOptions) {
+function run(options) {
     app.get('/', (req, res) => {
         const indexPath = path.join(__dirname, '..', '..', 'frontend', 'public', 'index.html')
         res.sendFile(indexPath)
     })
 
     app.get('/nodes', (req, res) => {
-        const options = getOptions()
         const nodes = options.nodesAsClient.concat(options.nodesAsServer)
-
         res.send(nodes)
     })
 
     app.get('/connect/:ip', (req, res) => {
-        const options = getOptions()
         const ip = req.params.ip
-
         options.connectTo(ip)
     })
 
