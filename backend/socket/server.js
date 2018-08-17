@@ -56,6 +56,11 @@ function getRemoteIpAddress(remoteAddress) {
     return remoteAddress.replace('::ffff:', '')
 }
 
+function getNodesToConnect(nodes, payload) {
+    const nodesToConnect = payload.diff(nodes)
+    return nodesToConnect
+}
+
 function spreadTheWord(options, payload) {
     const nodes = options.nodesAsClient.concat(options.nodesAsServer)
     const nodesToConnect = getNodesToConnect(nodes, payload)
