@@ -6,7 +6,7 @@ function run(io, getOptions, remoteIp) {
 }
 
 function onConnect(io, getOptions, remoteIp) {
-    let options = getOptions()
+    var options = getOptions()
     
     if(options.selfCheck()) {
         if(options.clients.notHas(io) && options.nodesAsServer.notHas(remoteIp)) {

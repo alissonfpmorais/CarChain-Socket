@@ -6,7 +6,7 @@ function run(io, getOptions) {
 }
 
 function onConnection(io, getOptions) {
-    let options = getOptions()
+    var options = getOptions()
 
     if(options.selfCheck()) {
         const nodes = options.nodesAsClient.concat(options.nodesAsServer)
