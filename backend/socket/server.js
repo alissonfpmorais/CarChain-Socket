@@ -20,9 +20,12 @@ function onConnection(io, getOptions) {
                 options.nodesAsClient.push(remoteIp)
                 nodes.push(remoteIp)
 
-                child.emit('server-nodelist', nodes)
+                child.emit('server-nodelist', sendingNodes(nodes))
 
-                child.on('nodes-to-connect', payload => spreadTheWord(getOptions(), payload))
+                child.on('nodes-to-connect', payload => {
+                    console.log('nodes to connect: ' + payload)
+                    spreadTheWord(getOptions(), payload)
+                })
 
                 child.on('disconnect', () => {
                     console.log('node disconnected')
@@ -40,6 +43,11 @@ function onConnection(io, getOptions) {
             emitError('server internal error, closing connection!')
         }
     }
+}
+
+function sendingNodes(nodes) {
+    console.log('sending nodes')
+    return nodes
 }
 
 function getRemoteIpAddress(remoteAddress) {

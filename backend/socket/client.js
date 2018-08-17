@@ -14,8 +14,15 @@ function onConnect(io, getOptions, remoteIp) {
             options.clients.push(io)
             options.nodesAsServer.push(remoteIp)
 
-            io.on('server-nodelist', payload => spreadTheWord(getOptions(), payload))
-            io.on('nodes-to-connect', payload => spreadTheWord(getOptions(), payload))
+            io.on('server-nodelist', payload => {
+                console.log('server nodelist: ' + payload)
+                spreadTheWord(getOptions(), payload)
+            })
+            
+            io.on('nodes-to-connect', payload => {
+                console.log('nodes to connect: ' + payload)
+                spreadTheWord(getOptions(), payload)
+            })
         } 
         else emitError(io, 'node previously connected, closing connection!')
     } 
