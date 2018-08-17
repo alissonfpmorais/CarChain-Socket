@@ -1,121 +1,77 @@
-const os = require('os')
-const express = require('express')
+const socketClient = require('socket.io-client')
+const socketServer = require('socket.io')
 const request = require('request')
-const server = require('socket.io')
-const client = require('socket.io-client')
 
-const METADATA_NETWORK_INTERFACE_URL = 'http://metadata/computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip';
-const port = 3001
-const ios = server(port)
-const app = express()
+const http = require('./backend/http/http')
+const client = require('./backend/socket/client')
+const server = require('./backend/socket/server')
 
-const connectionList = []
-const nodeList = []
+const metaDataUrl = 'http://metadata/computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip';
+const socketPort = 3001
 
-getLocalIpAddress((res) => nodeList.push(res))
-ios.on('connection', onConnectionEstablished(client))
+const options = {
+    externalIp: undefined,
+    server: socketServer(socketPort),
+    clients: [],
+    nodesAsServer: [],
+    nodesAsClient: [],
+    connectTo: connectTo,
+    connectToPool: connectToPool,
+    selfCheck: selfCheck
+}
 
-app.get('/:ip', function(req, res) {
-    const ip = req.params.ip
-    const ioc = client('http://' + ip + ':' + port)
-
-    ioc.on('connect', () => {
-        if (nodeList.notHas(ip)) nodeList.push(ip)
-    })
-    
-    ioc.on('node-list', populateNetwork(client))
-})
-
-app.listen(3002, function() {
-    console.log('listening on 3002')
-})
-
-function getLocalIpAddress(doAfterRequest) {
-    const options = {
-        url: METADATA_NETWORK_INTERFACE_URL,
+function getExternalIpAddress(doAfterRequest) {
+    const opts = {
+        url: metaDataUrl,
         headers: { 'Metadata-Flavor': 'Google' }
     }
 
-    request(options, (err, resp, body) => {
+    request(opts, (err, resp, body) => {
         if (err || resp.statusCode !== 200) {
             console.log('Error while talking to metadata server, assuming localhost');
-            return doAfterRequest('localhost')
+            return run('localhost')
         }
 
-        return doAfterRequest(body)
+        return run(body)
     })
 }
 
-function getRemoteIpAddress(remoteAddress) {
-    return remoteAddress.replace('::ffff:', '')
+function connectTo(ip) {
+    const ioc = client('http://' + ip + ':' + port)
+    client.run(ioc, getOptions, ip)
 }
 
-function onConnectionEstablished(ioClient) {
-    return function(socket) {
-        console.log('user connected')
-
-        console.log('nodeList1')
-        console.log(nodeList)
-
-        const remoteIp = getRemoteIpAddress(socket.conn.remoteAddress)
-        if (nodeList.notHas(remoteIp)) nodeList.push(remoteIp)
-
-        console.log('nodeList2')
-        console.log(nodeList)
-
-        socket.broadcast.emit('node-list', rNodeList())
-        socket.on('disconnect', () => console.log('user disconnected'))
-    }
+function connectToPool(nodesToConnect) {
+    nodesToConnect.forEach(node => {
+        const nodes = options.nodesAsClient.concat(options.nodesAsServer)
+        
+        if(nodes.notHas(node)) {
+            const ioc = client('http://' + ip + ':' + port)
+            client.run(ioc, getOptions, ip)
+        }
+    })
 }
 
-function rNodeList() {
-    console.log('broadcasting...')
-    return nodeList
+function getOptions() {
+    return options
 }
 
-function populateNetwork(ioClient) {
-    return function(nodes) {
-        console.log('populate')
-        console.log('nodeList3')
-        console.log(nodeList)
-        console.log('nodes3')
-        console.log(nodes)
-
-        const nodesToConnect = []
-
-        if (nodeList.length >= nodes) nodesToConnect.push(nodeList.diff(nodes))
-        else nodesToConnect.push(nodes.diff(nodeList))
-    
-        nodesToConnect
-            .filter(ip => nodeList.notHas(ip))
-            .forEach(ip => {
-                console.log('nodesToConnect forEach2')
-                const ioc = ioClient('http://' + ip + ':' + port)
-
-                ioc.on('connect', () => {
-                    connectionList.push(ioc)
-                    nodeList.push(ip)
-                })
-            })
-    }
+function selfCheck() {
+    return (this.externalIp !== undefined) &&
+        (this.server !== undefined) &&
+        (this.clients !== undefined) &&
+        (this.nodesAsServer !== undefined) &&
+        (this.nodesAsClient !== undefined) &&
+        (this.connectTo !== undefined) &&
+        (this.connectToPool !== undefined)
 }
 
-Array.prototype.has = function(value) {
-    return this.indexOf(value) >= 0
+function run(externalIp) {
+    options.externalIp = externalIp
+    options.nodesAsServer.push(externalIp)
+
+    http.run(getOptions)
+    server.run(options.server, getOptions)
 }
 
-Array.prototype.notHas = function(value) {
-    return !this.has(value)
-}
-
-Array.prototype.isEmpty = function() {
-    return this.length <= 0
-}
-
-Array.prototype.isNotEmpty = function() {
-    return !this.isEmpty()
-}
-
-Array.prototype.diff = function(arr) {
-    return this.filter(item => arr.indexOf(item) < 0)
-}
+getExternalIpAddress()
