@@ -71,8 +71,11 @@ function emitError(io, payload) {
     console.log(payload)
 
     try { child.emit('error', payload) }
-    catch { console.log('Can\'t emit error to child') }
-    
+    catch(err) {
+        console.log('Can\'t emit error to child')
+        console.log('Error: ' + err)
+    }
+
     setTimeout(() => io.disconnect(true), 3000)
 }
 
