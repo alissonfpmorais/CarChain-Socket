@@ -37,8 +37,8 @@
                     .then(response => {
                         const nodes = response.data
                         
+                        $('#nodes').empty()
                         nodes.forEach(node => {
-                            $('#nodes').empty()
                             $('#nodes').append($('<li>').text(node))
                             setTimeout(updateNodes, 5000)
                         })
