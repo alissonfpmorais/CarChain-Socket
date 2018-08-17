@@ -7,18 +7,15 @@ function run(options) {
 
 function onConnection(io, options) {
     if(options.selfCheck()) {
-        const nodes = options.nodesAsClient.concat(options.nodesAsServer)
-
         return function(child) {
             console.log('new node connected')
-
             const remoteIp = getRemoteIpAddress(child.conn.remoteAddress)
-            if(nodes.notHas(remoteIp)) {
+
+            if(options.nodesAsClient.notHas(remoteIp) && options.nodesAsServer.notHas(remoteIp)) {
                 console.log('remote ip: ' + remoteIp)
                 options.nodesAsClient.push(remoteIp)
-                nodes.push(remoteIp)
 
-                child.emit('server-nodelist', sendingNodes(nodes))
+                child.emit('server-nodelist', sendingNodes(options))
 
                 child.on('nodes-to-connect', payload => {
                     console.log('nodes to connect: ' + payload)
@@ -31,10 +28,7 @@ function onConnection(io, options) {
                     console.log('node disconnected')
                     console.log('remote ip: ' + remoteIp)
 
-                    if(options.selfCheck()) {
-                        options.nodesAsClient.remove(remoteIp)
-                        nodes.remove(remoteIp)
-                    }
+                    if(options.selfCheck()) options.nodesAsClient.remove(remoteIp)
                     else emitError('node previously connected, closing connection!')
                 })
             }
@@ -47,8 +41,9 @@ function onConnection(io, options) {
     }
 }
 
-function sendingNodes(nodes) {
+function sendingNodes(options) {
     console.log('sending nodes')
+    const nodes = options.nodesAsClient.concat(options.nodesAsServer)
     return nodes
 }
 
