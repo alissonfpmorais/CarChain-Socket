@@ -18,7 +18,7 @@ function onConnection(io, options) {
                 child.emit('server-nodelist', sendingNodes(options))
 
                 child.on('nodes-to-connect', payload => {
-                    console.log('nodes to connect: ' + payload)
+                    console.log('received nodes: ' + payload)
 
                     if(options.selfCheck()) spreadTheWord(options, payload)
                     else emitError('node previously connected, closing connection!')

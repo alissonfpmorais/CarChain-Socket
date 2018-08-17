@@ -11,7 +11,7 @@ function run(io, options, remoteIp) {
     })
 
     io.on('nodes-to-connect', payload => {
-        console.log('nodes to connect: ' + payload)
+        console.log('received nodes: ' + payload)
 
         if(options.selfCheck()) spreadTheWord(options, payload)
         else emitError(io, 'client internal error, closing connection!')
@@ -19,13 +19,7 @@ function run(io, options, remoteIp) {
 
     io.on('reconnect', () => {
         console.log('reconnecting...')
-
-        if(options.selfCheck()) {
-            options.nodesAsServer.push(remoteIp)
-            options.clients.push(io)
-
-            io.emit('nodes-to-connect', sendingNodes(options))
-        }
+        io.emit('nodes-to-connect', sendingNodes(options))
     })
 
     io.on('disconnect', () => {
