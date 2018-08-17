@@ -70,7 +70,7 @@ function spreadTheWord(options, payload) {
 function emitError(io, payload) {
     console.log(payload)
 
-    try { child.emit('error', payload) }
+    try { io.emit('error', payload) }
     catch(err) {
         console.log('Can\'t emit error to child')
         console.log('Error: ' + err)
