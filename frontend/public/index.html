@@ -27,7 +27,7 @@
 
                 $('form').submit(() => {
                     axios.get('/connect/' + $('#ip_input').val())
-                        .then(() => updateNodes())
+                        .then(() => {})
                         .catch(err => console.log('Connection error: ' + err))
                 })
             })
@@ -36,8 +36,11 @@
                 axios.get('/nodes')
                     .then(response => {
                         const nodes = response.data
+                        
                         nodes.forEach(node => {
+                            $('#nodes').empty()
                             $('#nodes').append($('<li>').text(node))
+                            setTimeout(updateNodes, 5000)
                         })
                     })
                     .catch(err => console.log('Updating nodes error: ' + err))
