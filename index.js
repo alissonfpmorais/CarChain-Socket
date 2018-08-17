@@ -39,7 +39,7 @@ function getExternalIpAddress(doAfterRequest) {
 }
 
 function connectTo(ip) {
-    const ioc = client('http://' + ip + ':' + socketPort)
+    const ioc = socketClient('http://' + ip + ':' + socketPort)
     client.run(ioc, getOptions, ip)
 }
 
@@ -48,7 +48,7 @@ function connectToPool(nodesToConnect) {
         const nodes = options.nodesAsClient.concat(options.nodesAsServer)
         
         if(nodes.notHas(node)) {
-            const ioc = client('http://' + ip + ':' + socketPort)
+            const ioc = socketClient('http://' + ip + ':' + socketPort)
             client.run(ioc, getOptions, ip)
         }
     })
