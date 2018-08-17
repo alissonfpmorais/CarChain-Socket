@@ -25,6 +25,9 @@ function onConnection(io, getOptions) {
                 child.on('nodes-to-connect', payload => spreadTheWord(getOptions(), payload))
 
                 child.on('disconnect', () => {
+                    console.log('node disconnected')
+                    console.log('remote ip: ' + remoteIp)
+
                     options = getOptions()
                     options.nodesAsClient.remove(remoteIp)
                     nodes.remove(remoteIp)

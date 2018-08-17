@@ -16,11 +16,13 @@ function onConnect(io, getOptions, remoteIp) {
             io.on('server-nodelist', payload => spreadTheWord(getOptions(), payload))
             io.on('nodes-to-connect', payload => spreadTheWord(getOptions(), payload))
         } 
-        else emitError('node previously connected, closing connection!')
+        else emitError(io, 'node previously connected, closing connection!')
     } 
     else emitError(io, 'client internal error, closing connection!')
 
     io.on('disconnect', () => {
+        console.log('disconnecting...')
+
         options = getOptions()
         options.nodesAsServer.remove(remoteIp)
         options.clients.remove(io)
