@@ -44,11 +44,7 @@ function connectTo(ip) {
 function connectToPool(nodesToConnect) {
     nodesToConnect.forEach(node => {
         const nodes = options.nodesAsClient.concat(options.nodesAsServer)
-        
-        if(nodes.notHas(node)) {
-            const ioc = socketClient('http://' + ip + ':' + socketPort)
-            client.run(ioc, getOptions, ip)
-        }
+        if(nodes.notHas(node)) connectTo(node)
     })
 }
 

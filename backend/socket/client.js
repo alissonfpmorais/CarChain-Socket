@@ -6,6 +6,7 @@ function run(io, getOptions, remoteIp) {
 }
 
 function onConnect(io, getOptions, remoteIp) {
+    console.log('node connected to: ' + remoteIp)
     var options = getOptions()
     
     if(options.selfCheck()) {
