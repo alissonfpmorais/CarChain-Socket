@@ -60,10 +60,11 @@ function spreadTheWord(options, payload) {
     const nodes = options.nodesAsClient.concat(options.nodesAsServer)
     const nodesToConnect = getNodesToConnect(nodes, payload)
 
-    if(nodesToConnect.length > 0) options.connectToPool(nodesToConnect)
-
-    options.clients.forEach(client => client.emit('nodes-to-connect', nodesToConnect))
-    options.server.emit('nodes-to-connect', nodesToConnect)
+    if(nodesToConnect.length > 0) {
+        options.connectToPool(nodesToConnect)
+        options.clients.forEach(client => client.emit('nodes-to-connect', nodesToConnect))
+        options.server.emit('nodes-to-connect', nodesToConnect)
+    }
 }
 
 function emitError(io, payload) {

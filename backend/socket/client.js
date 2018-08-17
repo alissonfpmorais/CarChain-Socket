@@ -17,6 +17,17 @@ function run(io, options, remoteIp) {
         else emitError(io, 'client internal error, closing connection!')
     })
 
+    io.on('reconnect', () => {
+        console.log('reconnecting...')
+
+        if(options.selfCheck()) {
+            options.nodesAsServer.push(remoteIp)
+            options.clients.push(io)
+
+            io.emit('nodes-to-connect', sendingNodes(options))
+        }
+    })
+
     io.on('disconnect', () => {
         console.log('disconnecting...')
 
@@ -45,6 +56,12 @@ function onConnect(io, options, remoteIp) {
     }
 }
 
+function sendingNodes(options) {
+    console.log('sending nodes')
+    const nodes = options.nodesAsClient.concat(options.nodesAsServer)
+    return nodes
+}
+
 function getNodesToConnect(nodes, payload) {
     const nodesToConnect = payload.diff(nodes)
     return nodesToConnect
@@ -60,10 +77,11 @@ function spreadTheWord(options, payload) {
     console.log('nodes: ' + nodes)
     console.log('nodesToConnect: ' + nodesToConnect)
 
-    if(nodesToConnect.length > 0) options.connectToPool(nodesToConnect)
-
-    options.clients.forEach(client => client.emit('nodes-to-connect', nodesToConnect))
-    options.server.emit('nodes-to-connect', nodesToConnect)
+    if(nodesToConnect.length > 0) {
+        options.connectToPool(nodesToConnect)
+        options.clients.forEach(client => client.emit('nodes-to-connect', nodesToConnect))
+        options.server.emit('nodes-to-connect', nodesToConnect)
+    }
 }
 
 function emitError(io, payload) {
