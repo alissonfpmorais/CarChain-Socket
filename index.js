@@ -1,5 +1,3 @@
-"use strict";
-
 const socketClient = require('socket.io-client')
 const socketServer = require('socket.io')
 const request = require('request')

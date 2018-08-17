@@ -1,5 +1,3 @@
-"use strict";
-
 require('../../utils/array')()
 
 function run(io, getOptions) {
