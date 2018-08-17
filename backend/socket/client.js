@@ -6,11 +6,13 @@ function run(io, getOptions, remoteIp) {
 }
 
 function onConnect(io, getOptions, remoteIp) {
-    console.log('node connected to: ' + remoteIp)
+    console.log('establishing connection')
     var options = getOptions()
     
     if(options.selfCheck()) {
         if(options.clients.notHas(io) && options.nodesAsServer.notHas(remoteIp)) {
+            console.log('node connected to: ' + remoteIp)
+
             options.clients.push(io)
             options.nodesAsServer.push(remoteIp)
 
@@ -18,7 +20,7 @@ function onConnect(io, getOptions, remoteIp) {
                 console.log('server nodelist: ' + payload)
                 spreadTheWord(getOptions(), payload)
             })
-            
+
             io.on('nodes-to-connect', payload => {
                 console.log('nodes to connect: ' + payload)
                 spreadTheWord(getOptions(), payload)
