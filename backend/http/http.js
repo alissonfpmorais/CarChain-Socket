@@ -11,7 +11,7 @@ function run(options) {
 
     app.get('/nodes', (req, res) => {
         const nodes = options.nodesAsClient.concat(options.nodesAsServer)
-        res.send(nodes)
+        res.json(nodes)
     })
 
     app.get('/connect/:ip', (req, res) => {
