@@ -1,3 +1,4 @@
+"use strict";
 require('../../utils/array')()
 
 function run(io, getOptions, remoteIp) {
@@ -21,7 +22,7 @@ function onConnect(io, getOptions, remoteIp) {
     else emitError(io, 'client internal error, closing connection!')
 
     io.on('disconnect', () => {
-        const options = getOptions()
+        options = getOptions()
         options.nodesAsServer.remove(remoteIp)
         options.clients.remove(io)
     })
