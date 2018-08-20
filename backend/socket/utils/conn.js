@@ -122,9 +122,9 @@ function onConnectToClient(io, options, callback) {
                         opt.clientNodes.push(remoteIp)
                         callback(child, options, remoteIp)
                     })
-                    .doOnFailure(() => forceDisconnect(io, 'client internal error, closing connection!'))
+                    .doOnFailure(() => forceDisconnect(child, 'client internal error, closing connection!'))
             })
-            .doOnFailure(() => forceDisconnect(io, 'client internal error, closing connection!'))
+            .doOnFailure(() => forceDisconnect(child, 'client internal error, closing connection!'))
     }
 }
 
