@@ -38,9 +38,9 @@ function getNodesToConnect(nodes, payload) {
     return nodesToConnect
 }
 
-function spreadTheWord(io, options, payload) {
+function spreadTheWord(io, options, receivedNodes) {
     console.log('spread the word')
-    console.log('payload: ' + payload)
+    console.log('receivedNodes: ' + receivedNodes)
 
     const trySpread = new patterns.Try(() => options.clientNodes.concat(options.serverNodes))
 
@@ -51,7 +51,7 @@ function spreadTheWord(io, options, payload) {
             console.log(payload)
             forceDisconnect(io, payload)
         })
-        .map(nodes => getNodesToConnect(nodes, payload))
+        .map(nodes => getNodesToConnect(nodes, receivedNodes))
         .doOnSuccess(nodesToConnect => console.log('nodesToConnect: ' + nodesToConnect))
         .filter(nodesToConnect => nodesToConnect.length > 0)
         .doOnSuccess(nodesToConnect => {
@@ -59,7 +59,7 @@ function spreadTheWord(io, options, payload) {
             options.clients.forEach(client => client.emit(keys.nodeList, nodesToConnect))
             options.server.emit(keys.nodeList, nodesToConnect)
         })
-        .doOnFailure(() => console.log('No nodes to connect'))
+        .doOnFailure(() => console.log('no nodes to connect'))
         .map(nodesToConnect => nodesToConnect !== undefined)
         .getOrElse(() => false)
 }
