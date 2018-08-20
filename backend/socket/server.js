@@ -4,7 +4,7 @@ const conn = require('./utils/conn')
 function onConnect(child, options, remoteIp) {
     console.log('onConnect')
 
-    child.emit(conn.keys.nodeList, sendingNodes(child, options))
+    child.emit(conn.keys.nodeList, conn.sendingNodes(child, options))
 
     child.on(conn.keys.nodeList, payload => {
         console.log('received nodes: ' + payload)
