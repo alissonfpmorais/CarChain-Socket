@@ -122,7 +122,7 @@ function onConnectToClient(io, options, callback) {
                 tryOpt
                     .filter(opt => {
                         console.log('filtering...')
-                        opt.clientNodes.notHas(remoteIp) && opt.serverNodes.notHas(remoteIp)
+                        return opt.clientNodes.notHas(remoteIp) && opt.serverNodes.notHas(remoteIp)
                     })
                     .doOnSuccess(opt => {
                         console.log('updating node list')
