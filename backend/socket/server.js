@@ -1,11 +1,9 @@
 require('../../utils/array')()
 const conn = require('./utils/conn')
 
-function run(io, options) {
-    io.on(conn.keys.server.connect, conn.onConnectToClient(io, options, onConnect))
-}
-
 function onConnect(child, options, remoteIp) {
+    console.log('onConnect')
+
     child.emit(conn.keys.nodeList, sendingNodes(child, options))
 
     child.on(conn.keys.nodeList, payload => {
@@ -17,6 +15,10 @@ function onConnect(child, options, remoteIp) {
         console.log('disconnecting...')
         conn.onDisconnectFromClient(child, options, remoteIp)
     })
+}
+
+function run(io, options) {
+    io.on(conn.keys.server.connect, conn.onConnectToClient(io, options, onConnect))
 }
 
 module.exports = { run }
