@@ -6,7 +6,7 @@ function run(io, options) {
 }
 
 function onConnect(child, options, remoteIp) {
-    child.emit(conn.keys.nodeList, sendingNodes(options))
+    child.emit(conn.keys.nodeList, sendingNodes(child, options))
 
     child.on(conn.keys.nodeList, payload => {
         console.log('received nodes: ' + payload)

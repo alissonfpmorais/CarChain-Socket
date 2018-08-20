@@ -20,7 +20,7 @@ function getRemoteIpAddress(remoteAddress) {
     return remoteAddress.replace('::ffff:', '')
 }
 
-function sendingNodes(options) {
+function sendingNodes(io, options) {
     console.log('sendingNodes')
     const tryNodes = new patterns.Try(() => options.clientNodes.concat(options.serverNodes))
 
