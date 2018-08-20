@@ -16,10 +16,12 @@ const keys = {
 }
 
 function getRemoteIpAddress(remoteAddress) {
+    console.log('getRemoteIpAddress')
     return remoteAddress.replace('::ffff:', '')
 }
 
 function sendingNodes(options) {
+    console.log('sendingNodes')
     const tryNodes = new patterns.Try(() => options.clientNodes.concat(options.serverNodes))
 
     return tryNodes
@@ -33,6 +35,7 @@ function sendingNodes(options) {
 }
 
 function getNodesToConnect(nodes, payload) {
+    console.log('getNodesToConnect')
     console.log('computing nodes to connect')
     const nodesToConnect = payload.diff(nodes)
 
@@ -66,6 +69,7 @@ function spreadTheWord(io, options, payload) {
 }
 
 function forceDisconnect(io, payload) {
+    console.log('forceDisconnect')
     console.log('payload: ' + payload)
     const tryComm = new patterns.Try(() => payload)
 
@@ -80,6 +84,8 @@ function forceDisconnect(io, payload) {
 }
 
 function onConnectToServer(io, options, remoteIp) {
+    console.log('onConnectToServer')
+
     return function() {
         const tryConnect = new patterns.Try(() => remoteIp)
 
@@ -97,6 +103,8 @@ function onConnectToServer(io, options, remoteIp) {
 }
 
 function onConnectToClient(io, options, callback) {
+    console.log('onConnectToClient')
+
     return function(child) {
         const tryOpt = new patterns.Try(() => options.clientNodes.length >= 0 && options.serverNodes.length >= 0)
         const tryConnect = new patterns.Try(() => getRemoteIpAddress(child.conn.remoteAddress))
@@ -119,6 +127,7 @@ function onConnectToClient(io, options, callback) {
 }
 
 function onDisconnectFromServer(io, options, remoteIp) {
+    console.log('onDisconnectFromServer')
     const tryDc = new patterns.Try(() => options.serverNodes.length >= 0 && options.clients.length >= 0)
 
     return tryDc
@@ -131,6 +140,7 @@ function onDisconnectFromServer(io, options, remoteIp) {
 }
 
 function onDisconnectFromClient(io, options, remoteIp) {
+    console.log('onDisconnectFromClient')
     const tryDc = new patterns.Try(() => options.clientNodes.length >= 0)
 
     return tryDc

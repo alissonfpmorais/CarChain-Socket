@@ -10,7 +10,7 @@ function run(options) {
     })
 
     app.get('/nodes', (req, res) => {
-        const nodes = options.nodesAsClient.concat(options.nodesAsServer)
+        const nodes = options.clientNodes.concat(options.serverNodes)
         res.json(nodes)
     })
 
