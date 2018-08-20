@@ -71,3 +71,5 @@ Either.prototype.flatMap = function(compute) {
     if (this.left === undefined && this.right !== undefined) return compute(this.right)
     return this
 }
+
+module.exports = { Kind, Try, Either }

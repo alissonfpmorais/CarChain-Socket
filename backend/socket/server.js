@@ -1,5 +1,4 @@
 require('../../utils/array')()
-const patterns = require('../../utils/patterns')
 const conn = require('./utils/conn')
 
 function run(io, options) {
