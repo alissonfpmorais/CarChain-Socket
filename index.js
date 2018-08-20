@@ -11,7 +11,7 @@ const socketPort = 3001
 
 const options = {
     externalIp: undefined,
-    clients = [],
+    clients: [],
     serverNodes: [],
     clientNodes: [],
     connectTo: connectTo,
