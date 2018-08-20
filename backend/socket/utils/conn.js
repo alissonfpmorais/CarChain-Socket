@@ -75,13 +75,13 @@ function forceDisconnect(io, payload) {
             setTimeout(() => io.disconnect(true), 3000)
         })
         .doOnFailure(() => console.log('Can\'t communicate to child'))
-        .flatMap(() => new patterns.Try(this.value !== undefined))
+        .flatMap(() => new patterns.Try(() => this.value !== undefined))
         .getOrElse(() => false)
 }
 
 function onConnectToServer(io, options, remoteIp) {
     return function() {
-        const tryConnect = new patterns.Try(remoteIp)
+        const tryConnect = new patterns.Try(() => remoteIp)
 
         tryConnect
             .doOnSuccess(ip => {
@@ -98,8 +98,8 @@ function onConnectToServer(io, options, remoteIp) {
 
 function onConnectToClient(io, options, callback) {
     return function(child) {
-        const tryOpt = new patterns.Try(options.clientNodes.length >= 0 && options.serverNodes.length >= 0)
-        const tryConnect = new patterns.Try(getRemoteIpAddress(child.conn.remoteAddress))
+        const tryOpt = new patterns.Try(() => options.clientNodes.length >= 0 && options.serverNodes.length >= 0)
+        const tryConnect = new patterns.Try(() => getRemoteIpAddress(child.conn.remoteAddress))
 
         tryConnect
             .doOnSuccess(remoteIp => {
@@ -119,7 +119,7 @@ function onConnectToClient(io, options, callback) {
 }
 
 function onDisconnectFromServer(io, options, remoteIp) {
-    const tryDc = new patterns.Try(options.serverNodes.length >= 0 && options.clients.length >= 0)
+    const tryDc = new patterns.Try(() => options.serverNodes.length >= 0 && options.clients.length >= 0)
 
     return tryDc
         .filter(isOptionsValid => isOptionsValid)
@@ -131,7 +131,7 @@ function onDisconnectFromServer(io, options, remoteIp) {
 }
 
 function onDisconnectFromClient(io, options, remoteIp) {
-    const tryDc = new patterns.Try(options.clientNodes.length >= 0)
+    const tryDc = new patterns.Try(() => options.clientNodes.length >= 0)
 
     return tryDc
         .filter(isOptionsValid => isOptionsValid)
