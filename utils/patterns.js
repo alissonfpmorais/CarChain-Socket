@@ -18,9 +18,9 @@ Try.prototype.run = function(compute) {
 Try.prototype.doOnSuccess = function(compute) {
     if (this.value !== undefined) {
         try { compute(this.value) }
-        catch(err) { return this }
+        catch(err) { return new Try(() => this.value) }
     }
-    return this
+    return new Try(() => this.value)
 }
 
 Try.prototype.doOnFailure = function(compute) {

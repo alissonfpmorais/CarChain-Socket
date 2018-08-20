@@ -65,7 +65,7 @@ function spreadTheWord(io, options, receivedNodes) {
             console.log('starting connection 2...')
             options.clients.forEach(client => client.emit(keys.nodeList, nodesToConnect))
             console.log('starting connection 3...')
-            options.server.emit(keys.nodeList, nodesToConnect)
+            options.server.emit(keys.nodeList, nodesToConnect) 
         })
         .doOnFailure(() => console.log('no nodes to connect'))
         .map(nodesToConnect => nodesToConnect !== undefined)
