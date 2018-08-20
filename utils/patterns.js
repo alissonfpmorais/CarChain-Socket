@@ -1,10 +1,8 @@
 function Kind(data) { }
 
-function Try(compute) {
+function Try(data) {
     Kind.call()
-
-    try { this.value = compute() }
-    catch(err) { this.value = undefined }
+    this.value = data
 }
 
 Try.prototype.run = function(compute) {

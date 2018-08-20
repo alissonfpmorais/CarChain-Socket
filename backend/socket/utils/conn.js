@@ -113,7 +113,7 @@ function onConnectToClient(io, options, callback) {
 
     return function(child) {
         const tryOpt = new patterns.Try(options)
-        const tryConnect = new patterns.Try(getRemoteIpAddress(child.conn.remoteAddress))
+        const tryConnect = new patterns.Try(getRemoteIpAddress(child.handshake.address))
 
         tryConnect
             .doOnSuccess(remoteIp => {
