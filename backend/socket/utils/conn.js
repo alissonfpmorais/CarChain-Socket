@@ -109,6 +109,9 @@ function onConnectToClient(io, options, callback) {
         const tryOpt = new patterns.Try(() => options.clientNodes.length >= 0 && options.serverNodes.length >= 0)
         const tryConnect = new patterns.Try(() => getRemoteIpAddress(child.conn.remoteAddress))
 
+        console.log('tryOpt: ' + tryOpt)
+        console.log('tryConnect: ' + tryConnect)
+
         tryConnect
             .doOnSuccess(remoteIp => {
                 console.log('new node connected')
