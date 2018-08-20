@@ -9,14 +9,15 @@ const server = require('./backend/socket/server')
 const metaDataUrl = 'http://metadata/computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip';
 const socketPort = 3001
 
-const clients = []
-
 const options = {
     externalIp: undefined,
-    serverNodes: [],
-    clientNodes: [],
+    server: socketServer(socketPort),
+    clients: [],
+    nodesAsServer: [],
+    nodesAsClient: [],
     connectTo: connectTo,
-    connectToPool: connectToPool
+    connectToPool: connectToPool,
+    selfCheck: selfCheck
 }
 
 function getExternalIpAddress(doAfterRequest) {
@@ -42,25 +43,39 @@ function connectTo(ip) {
 
 function connectToPool(nodesToConnect) {
     nodesToConnect.forEach(node => {
-        const nodes = options.clientNodes.concat(options.serverNodes)
+        const nodes = options.nodesAsClient.concat(options.nodesAsServer)
         if(nodes.notHas(node)) connectTo(node)
     })
+}
+
+function getOptions() {
+    return options
+}
+
+function selfCheck() {
+    return (this.externalIp !== undefined) &&
+        (this.server !== undefined) &&
+        (this.clients !== undefined) &&
+        (this.nodesAsServer !== undefined) &&
+        (this.nodesAsClient !== undefined) &&
+        (this.connectTo !== undefined) &&
+        (this.connectToPool !== undefined)
 }
 
 function showStatus() {
     console.log('-------------------------------------------------')
     console.log('Status')
-    console.log('Living nodes: ' + options.clientNodes.concat(options.serverNodes))
+    console.log('Living nodes: ' + options.nodesAsClient.concat(options.nodesAsServer))
 
     setTimeout(() => showStatus(), 30000)
 }
 
 function run(externalIp) {
     options.externalIp = externalIp
-    options.serverNodes.push(externalIp)
+    options.nodesAsServer.push(externalIp)
 
     http.run(options)
-    server.run(socketServer(socketPort), options)
+    server.run(options)
     showStatus()
 }
 

@@ -1,4 +1,8 @@
 module.exports = function() {
+    Array.prototype.duplicate = function() {
+        return this.concat([])
+    }
+
     Array.prototype.has = function(value) {
         return this.indexOf(value) >= 0
     }
