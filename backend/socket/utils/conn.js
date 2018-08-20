@@ -35,6 +35,8 @@ function getNodesToConnect(nodes, payload) {
     console.log('computing nodes to connect')
     const nodesToConnect = payload.diff(nodes)
 
+    console.log('nodes to connect2: ' + nodesToConnect)
+
     return nodesToConnect
 }
 
@@ -53,10 +55,16 @@ function spreadTheWord(io, options, receivedNodes) {
         })
         .map(nodes => getNodesToConnect(nodes, receivedNodes))
         .doOnSuccess(nodesToConnect => console.log('nodesToConnect: ' + nodesToConnect))
-        .filter(nodesToConnect => nodesToConnect.length > 0)
+        .filter(nodesToConnect => {
+            console.log('filtering... ' + nodesToConnect.length > 0)
+            return nodesToConnect.length > 0
+        })
         .doOnSuccess(nodesToConnect => {
+            console.log('starting connection...')
             options.connectToPool(nodesToConnect)
+            console.log('starting connection 2...')
             options.clients.forEach(client => client.emit(keys.nodeList, nodesToConnect))
+            console.log('starting connection 3...')
             options.server.emit(keys.nodeList, nodesToConnect)
         })
         .doOnFailure(() => console.log('no nodes to connect'))
