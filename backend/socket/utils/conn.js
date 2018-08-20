@@ -120,14 +120,26 @@ function onConnectToClient(io, options, callback) {
                 console.log('remote ip: ' + remoteIp)
 
                 tryOpt
-                    .filter(opt => opt.clientNodes.notHas(remoteIp) && opt.serverNodes.notHas(remoteIp))
+                    .filter(opt => {
+                        console.log('filtering...')
+                        opt.clientNodes.notHas(remoteIp) && opt.serverNodes.notHas(remoteIp)
+                    })
                     .doOnSuccess(opt => {
+                        console.log('updating node list')
                         opt.clientNodes.push(remoteIp)
+
+                        console.log('calling callback')
                         callback(child, options, remoteIp)
                     })
-                    .doOnFailure(() => forceDisconnect(io, 'client internal error, closing connection!'))
+                    .doOnFailure(() => {
+                        console.log('failure on options')
+                        forceDisconnect(io, 'client internal error, closing connection!')
+                    })
             })
-            .doOnFailure(() => forceDisconnect(io, 'client internal error, closing connection!'))
+            .doOnFailure(() => {
+                console.log('failure on remoteIp')
+                forceDisconnect(io, 'client internal error, closing connection!')
+            })
     }
 }
 
