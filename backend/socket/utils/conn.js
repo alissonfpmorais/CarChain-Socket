@@ -73,6 +73,7 @@ function forceDisconnect(io, payload) {
     console.log('io: ')
     console.log(io)
     console.log('payload: ' + payload)
+
     const tryComm = new patterns.Try(() => payload)
 
     return tryComm
@@ -96,18 +97,8 @@ function onConnectToServer(io, options, remoteIp) {
                 console.log('establishing connection')
                 console.log('node connected to: ' + ip)
 
-                console.log('clients: ')
-                console.log(options.clients)
-                console.log('server nodes: ')
-                console.log(options.serverNodes)
-
                 options.clients.push(io)
                 options.serverNodes.push(ip)
-
-                console.log('clients: ')
-                console.log(options.clients)
-                console.log('server nodes: ')
-                console.log(options.serverNodes)
             })
             .doOnFailure(() => forceDisconnect(io, 'client internal error, closing connection!'))
     }
@@ -120,37 +111,20 @@ function onConnectToClient(io, options, callback) {
         const tryOpt = new patterns.Try(() => options)
         const tryConnect = new patterns.Try(() => getRemoteIpAddress(child.conn.remoteAddress))
 
-        console.log('tryOpt: ')
-        console.log(tryOpt)
-        console.log('tryConnect: ')
-        console.log(tryConnect)
-
         tryConnect
             .doOnSuccess(remoteIp => {
                 console.log('new node connected')
                 console.log('remote ip: ' + remoteIp)
 
                 tryOpt
-                    .filter(opt => {
-                        console.log('filtering...')
-                        return opt.clientNodes.notHas(remoteIp) && opt.serverNodes.notHas(remoteIp)
-                    })
+                    .filter(opt => opt.clientNodes.notHas(remoteIp) && opt.serverNodes.notHas(remoteIp))
                     .doOnSuccess(opt => {
-                        console.log('updating node list')
                         opt.clientNodes.push(remoteIp)
-
-                        console.log('calling callback')
                         callback(child, options, remoteIp)
                     })
-                    .doOnFailure(() => {
-                        console.log('failure on options')
-                        forceDisconnect(io, 'client internal error, closing connection!')
-                    })
+                    .doOnFailure(() => forceDisconnect(io, 'client internal error, closing connection!'))
             })
-            .doOnFailure(() => {
-                console.log('failure on remoteIp')
-                forceDisconnect(io, 'client internal error, closing connection!')
-            })
+            .doOnFailure(() => forceDisconnect(io, 'client internal error, closing connection!'))
     }
 }
 
