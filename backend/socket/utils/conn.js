@@ -96,8 +96,18 @@ function onConnectToServer(io, options, remoteIp) {
                 console.log('establishing connection')
                 console.log('node connected to: ' + ip)
 
+                console.log('clients: ')
+                console.log(options.clients)
+                console.log('server nodes: ')
+                console.log(options.serverNodes)
+
                 options.clients.push(io)
                 options.serverNodes.push(ip)
+
+                console.log('clients: ')
+                console.log(options.clients)
+                console.log('server nodes: ')
+                console.log(options.serverNodes)
             })
             .doOnFailure(() => forceDisconnect(io, 'client internal error, closing connection!'))
     }
