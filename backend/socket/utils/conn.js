@@ -25,13 +25,9 @@ function sendingNodes(io, options) {
     const tryNodes = new patterns.Try(() => options.clientNodes.concat(options.serverNodes))
 
     return tryNodes
-        .doOnSuccess(nodes => {
-            console.log('sending nodes')
-            io.emit(conn.keys.nodeList, nodes)
-        })
+        .doOnSuccess(nodes => console.log('nodes: ' + nodes))
         .doOnFailure(() => console.log('error sending nodes'))
-        .map(nodes => nodes.length >= 0)
-        .getOrElse(() => false)
+        .getOrElse(() => [])
 }
 
 function getNodesToConnect(nodes, payload) {
