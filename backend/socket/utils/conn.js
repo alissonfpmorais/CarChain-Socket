@@ -74,10 +74,7 @@ function forceDisconnect(io, payload) {
             io.emit(keys.forceDisconnect, p)
             setTimeout(() => io.disconnect(true), 3000)
         })
-        .doOnFailure(() => {
-            console.log('Can\'t communicate to child')
-            console.log('Error: ' + err)
-        })
+        .doOnFailure(() => console.log('Can\'t communicate to child'))
         .flatMap(() => new patterns.Try(this.value !== undefined))
         .getOrElse(() => false)
 }

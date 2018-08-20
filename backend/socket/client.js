@@ -16,7 +16,7 @@ function run(io, options, remoteIp) {
 
     io.on(conn.keys.client.disconnect, () => {
         console.log('disconnecting...')
-        conn.disconnectFromServer(io, options, remoteIp)
+        conn.onDisconnectFromServer(io, options, remoteIp)
     })
 }
 

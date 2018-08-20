@@ -15,7 +15,7 @@ function onConnect(child, options, remoteIp) {
 
     child.on(conn.keys.server.disconnect, () => {
         console.log('disconnecting...')
-        conn.onDisconnectFromClient(io, options, remoteIp)
+        conn.onDisconnectFromClient(child, options, remoteIp)
     })
 }
 
