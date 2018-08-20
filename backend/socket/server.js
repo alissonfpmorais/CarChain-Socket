@@ -8,7 +8,7 @@ function onConnect(child, options, remoteIp) {
 
     child.on(conn.keys.nodeList, payload => {
         console.log('received nodes: ' + payload)
-        conn.spreadTheWord(options, payload)
+        conn.spreadTheWord(child, options, payload)
     })
 
     child.on(conn.keys.server.disconnect, () => {

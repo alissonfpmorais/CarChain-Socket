@@ -6,7 +6,7 @@ function run(io, options, remoteIp) {
 
     io.on(conn.keys.nodeList, payload => {
         console.log('received nodes: ' + payload)
-        conn.spreadTheWord(options, payload)
+        conn.spreadTheWord(io, options, payload)
     })
 
     io.on(conn.keys.client.reconnect, () => {
