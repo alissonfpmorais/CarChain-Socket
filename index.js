@@ -9,10 +9,9 @@ const server = require('./backend/socket/server')
 const metaDataUrl = 'http://metadata/computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip';
 const socketPort = 3001
 
-const clients = []
-
 const options = {
     externalIp: undefined,
+    clients = [],
     serverNodes: [],
     clientNodes: [],
     connectTo: connectTo,
