@@ -22,7 +22,7 @@ function getRemoteIpAddress(remoteAddress) {
 
 function sendingNodes(io, options) {
     console.log('sendingNodes')
-    const tryNodes = new patterns.Try(() => options.clientNodes.concat(options.serverNodes))
+    const tryNodes = new patterns.Try(options.clientNodes.concat(options.serverNodes))
 
     return tryNodes
         .doOnSuccess(nodes => console.log('nodes: ' + nodes))
@@ -44,7 +44,7 @@ function spreadTheWord(io, options, receivedNodes) {
     console.log('spread the word')
     console.log('receivedNodes: ' + receivedNodes)
 
-    const trySpread = new patterns.Try(() => options.clientNodes.concat(options.serverNodes))
+    const trySpread = new patterns.Try(options.clientNodes.concat(options.serverNodes))
 
     return trySpread
         .doOnSuccess(nodes => console.log('nodes: ' + nodes))
@@ -78,7 +78,7 @@ function forceDisconnect(io, payload) {
     console.log(io)
     console.log('payload: ' + payload)
 
-    const tryComm = new patterns.Try(() => payload)
+    const tryComm = new patterns.Try(payload)
 
     return tryComm
         .doOnSuccess(p => {
@@ -94,7 +94,7 @@ function onConnectToServer(io, options, remoteIp) {
     console.log('onConnectToServer')
 
     return function() {
-        const tryConnect = new patterns.Try(() => remoteIp)
+        const tryConnect = new patterns.Try(remoteIp)
 
         tryConnect
             .doOnSuccess(ip => {
@@ -112,8 +112,8 @@ function onConnectToClient(io, options, callback) {
     console.log('onConnectToClient')
 
     return function(child) {
-        const tryOpt = new patterns.Try(() => options)
-        const tryConnect = new patterns.Try(() => getRemoteIpAddress(child.conn.remoteAddress))
+        const tryOpt = new patterns.Try(options)
+        const tryConnect = new patterns.Try(getRemoteIpAddress(child.conn.remoteAddress))
 
         tryConnect
             .doOnSuccess(remoteIp => {
@@ -134,7 +134,7 @@ function onConnectToClient(io, options, callback) {
 
 function onDisconnectFromServer(io, options, remoteIp) {
     console.log('onDisconnectFromServer')
-    const tryDc = new patterns.Try(() => options.serverNodes.length >= 0 && options.clients.length >= 0)
+    const tryDc = new patterns.Try(options.serverNodes.length >= 0 && options.clients.length >= 0)
 
     return tryDc
         .filter(isOptionsValid => isOptionsValid)
@@ -147,7 +147,7 @@ function onDisconnectFromServer(io, options, remoteIp) {
 
 function onDisconnectFromClient(io, options, remoteIp) {
     console.log('onDisconnectFromClient')
-    const tryDc = new patterns.Try(() => options.clientNodes.length >= 0)
+    const tryDc = new patterns.Try(options.clientNodes.length >= 0)
 
     return tryDc
         .filter(isOptionsValid => isOptionsValid)
