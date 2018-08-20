@@ -70,6 +70,8 @@ function spreadTheWord(io, options, payload) {
 
 function forceDisconnect(io, payload) {
     console.log('forceDisconnect')
+    console.log('io: ')
+    console.log(io)
     console.log('payload: ' + payload)
     const tryComm = new patterns.Try(() => payload)
 
@@ -106,7 +108,7 @@ function onConnectToClient(io, options, callback) {
     console.log('onConnectToClient')
 
     return function(child) {
-        const tryOpt = new patterns.Try(() => options.clientNodes.length >= 0 && options.serverNodes.length >= 0)
+        const tryOpt = new patterns.Try(() => options)
         const tryConnect = new patterns.Try(() => getRemoteIpAddress(child.conn.remoteAddress))
 
         console.log('tryOpt: ')
