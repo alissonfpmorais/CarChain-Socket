@@ -11,7 +11,7 @@ function run(io, options, remoteIp) {
 
     io.on(conn.keys.client.reconnect, () => {
         console.log('reconnecting...')
-        conn.sendingNodes(io, options)
+        io.emit(conn.keys.nodeList, conn.sendingNodes(io, options))
     })
 
     io.on(conn.keys.client.disconnect, () => {
