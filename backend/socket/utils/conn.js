@@ -25,17 +25,14 @@ function sendingNodes(io, options) {
     const tryNodes = new patterns.Try(options.clientNodes.concat(options.serverNodes))
 
     return tryNodes
-        .doOnSuccess(nodes => console.log('nodes: ' + nodes))
+        .debug('nodes')
         .doOnFailure(() => console.log('error sending nodes'))
         .getOrElse(() => [])
 }
 
 function getNodesToConnect(nodes, payload) {
     console.log('getNodesToConnect')
-    console.log('computing nodes to connect')
     const nodesToConnect = payload.diff(nodes)
-
-    console.log('nodes to connect2: ' + nodesToConnect)
 
     return nodesToConnect
 }
@@ -47,24 +44,19 @@ function spreadTheWord(io, options, receivedNodes) {
     const trySpread = new patterns.Try(options.clientNodes.concat(options.serverNodes))
 
     return trySpread
-        .doOnSuccess(nodes => console.log('nodes: ' + nodes))
+        .debug('nodes')
         .doOnFailure(() => {
             const payload = 'client internal error, closing connection!'
             console.log(payload)
             forceDisconnect(io, payload)
         })
         .map(nodes => getNodesToConnect(nodes, receivedNodes))
-        .doOnSuccess(nodesToConnect => console.log('nodesToConnect: ' + nodesToConnect))
-        .filter(nodesToConnect => {
-            console.log('filtering... ' + nodesToConnect.length > 0)
-            return nodesToConnect.length > 0
-        })
+        .debug('nodesToConnect')
+        .filter(nodesToConnect => nodesToConnect.length > 0)
+        .debug('filter')
         .doOnSuccess(nodesToConnect => {
-            console.log('starting connection...')
             options.connectToPool(nodesToConnect)
-            console.log('starting connection 2...')
             options.clients.forEach(client => client.emit(keys.nodeList, nodesToConnect))
-            console.log('starting connection 3...')
             options.server.emit(keys.nodeList, nodesToConnect) 
         })
         .doOnFailure(() => console.log('no nodes to connect'))
@@ -74,13 +66,11 @@ function spreadTheWord(io, options, receivedNodes) {
 
 function forceDisconnect(io, payload) {
     console.log('forceDisconnect')
-    console.log('io: ')
-    console.log(io)
-    console.log('payload: ' + payload)
 
     const tryComm = new patterns.Try(payload)
 
     return tryComm
+        .debug('payload')
         .doOnSuccess(p => {
             io.emit(keys.forceDisconnect, p)
             setTimeout(() => io.disconnect(true), 3000)
@@ -94,13 +84,12 @@ function onConnectToServer(io, options, remoteIp) {
     console.log('onConnectToServer')
 
     return function() {
+        console.log('establishing connection')
         const tryConnect = new patterns.Try(remoteIp)
 
         tryConnect
+            .debug('remoteIp')
             .doOnSuccess(ip => {
-                console.log('establishing connection')
-                console.log('node connected to: ' + ip)
-
                 options.clients.push(io)
                 options.serverNodes.push(ip)
             })
@@ -112,14 +101,14 @@ function onConnectToClient(io, options, callback) {
     console.log('onConnectToClient')
 
     return function(child) {
+        console.log('new node connected')
+
         const tryOpt = new patterns.Try(options)
         const tryConnect = new patterns.Try(getRemoteIpAddress(child.handshake.address))
 
         tryConnect
+            .debug('remoteIp')
             .doOnSuccess(remoteIp => {
-                console.log('new node connected')
-                console.log('remote ip: ' + remoteIp)
-
                 tryOpt
                     .filter(opt => opt.clientNodes.notHas(remoteIp) && opt.serverNodes.notHas(remoteIp))
                     .doOnSuccess(opt => {

@@ -13,6 +13,11 @@ Try.prototype.run = function(compute) {
     catch(err) { return undefined }
 }
 
+Try.prototype.debug = function(tag) {
+    console.log(tag + ': ' + this.value)
+    return this
+}
+
 Try.prototype.doOnSuccess = function(compute) {
     if (this.value !== undefined) {
         try { compute(this.value) }
